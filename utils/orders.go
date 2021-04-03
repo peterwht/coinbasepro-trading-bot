@@ -6,12 +6,13 @@ import (
 	"github.com/preichenberger/go-coinbasepro/v2"
 )
 
-func PlaceOrder(price, size, side, coinId string, currentOrder coinbasepro.Order) (coinbasepro.Order, error) {
+func PlaceOrder(price, size, side, tradingPair string, postOnly bool, currentOrder coinbasepro.Order) (coinbasepro.Order, error) {
 	orderConfig := coinbasepro.Order{
 		Price:     price,
 		Size:      size,
 		Side:      side, // side is buy or sell
-		ProductID: coinId,
+		ProductID: tradingPair,
+		PostOnly:  postOnly,
 	}
 
 	tempOrder, err := common.Client.CreateOrder(&orderConfig)

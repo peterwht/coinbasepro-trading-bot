@@ -14,13 +14,13 @@ import (
 Saves last order, and checks if that order was filled. If a buy order is filled
 then a sell (limit) order is placed, and vice versa.
 */
-func LimitOrdersConstantPrices(tradingPair string, sellPrice, buyPrice, initialSize decimal.Decimal, delayMultiplier float32) error {
+func LimitOrdersConstantPrices(coinId, tradingPair string, sellPrice, buyPrice, initialSize decimal.Decimal, startOrder coinbasepro.Order, delayMultiplier float32) error {
 
 	var err error
-	var currentOrder coinbasepro.Order = coinbasepro.Order{ID: ""}
+	var currentOrder coinbasepro.Order = startOrder
 
 	if currentOrder.ID == "" {
-		currentOrder, err = utils.PlaceOrder(buyPrice.String(), initialSize.String(), "buy", tradingPair, currentOrder)
+		currentOrder, err = utils.PlaceOrder(buyPrice.String(), initialSize.String(), "buy", tradingPair, true, currentOrder)
 
 		if err != nil {
 			return err
@@ -39,22 +39,22 @@ func LimitOrdersConstantPrices(tradingPair string, sellPrice, buyPrice, initialS
 			//if it was filled, and was a buy order
 			if currentOrder.Side == "buy" {
 				//gets the amount of crypto coins after fees
-				amount, err := utils.GetCryptoAmount(pendingOrder)
+				amount, err := utils.GetCryptoAmount(pendingOrder, coinId)
 				if err != nil {
 					return err
 				}
 
 				//place sell order with
-				currentOrder, err = utils.PlaceOrder(sellPrice.String(), amount, "sell", tradingPair, currentOrder)
+				currentOrder, err = utils.PlaceOrder(sellPrice.String(), amount.String(), "sell", tradingPair, true, currentOrder)
 				if err != nil {
 					return err
 				}
 			} else { // if sell order
-				amount, err := utils.GetCryptoAmount(pendingOrder)
+				amount, err := utils.GetCryptoAmount(pendingOrder, coinId)
 				if err != nil {
 					return err
 				}
-				currentOrder, err = utils.PlaceOrder(buyPrice.String(), amount, "buy", tradingPair, currentOrder)
+				currentOrder, err = utils.PlaceOrder(buyPrice.String(), amount.String(), "buy", tradingPair, true, currentOrder)
 				if err != nil {
 					return err
 				}

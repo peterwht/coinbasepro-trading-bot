@@ -3,24 +3,34 @@ package main
 import (
 	"coinbase-pro-trading-bot/common"
 	"coinbase-pro-trading-bot/simplebot"
+	"log"
 
+	"github.com/preichenberger/go-coinbasepro/v2"
 	"github.com/shopspring/decimal"
 )
 
-var tradingPair = "BTC-USD"
+var coinId = "MANA"
+var tradingPair = "MANA-USDC"
 
-//example prices for sandbox. These prices do not make gains
-var buyPrice decimal.Decimal = decimal.NewFromFloat(56002)
-var sellPrice decimal.Decimal = decimal.NewFromFloat(56040)
+var buyPrice decimal.Decimal = decimal.NewFromFloat(1.07)
+var sellPrice decimal.Decimal = decimal.NewFromFloat(1.14)
 
-//for now, 1.78 BTC was determined by BTC at 56002 using $100,000. 100,000/56002 = 1.78
-var initialSize decimal.Decimal = decimal.NewFromFloat(1.78)
+//for now, initialSize is determined by budget at buy price.
+var initialSize decimal.Decimal = decimal.NewFromFloat(37)
 
 func main() {
 
+	var err error
+
 	common.InitClient()
-	err := simplebot.LimitOrdersConstantPrices(tradingPair, sellPrice, buyPrice, initialSize, 3)
+	common.InitCurrencies()
 
-	println(err.Error())
+	//startOrder, err := common.Client.GetOrder("5357f73b-97fb-4668-9950-4de55eb7e064")
 
+	//Start order is an initital order for the program to watch. This can be found using GetOrders and documenting the ID
+	startOrder := coinbasepro.Order{ID: ""}
+
+	err = simplebot.LimitOrdersConstantPrices(coinId, tradingPair, sellPrice, buyPrice, initialSize, startOrder, 3)
+
+	log.Println(err.Error())
 }

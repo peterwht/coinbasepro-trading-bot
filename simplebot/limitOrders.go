@@ -39,7 +39,7 @@ func LimitOrdersConstantPrices(coinId, tradingPair string, sellPrice, buyPrice, 
 			//if it was filled, and was a buy order
 			if currentOrder.Side == "buy" {
 				//gets the amount of crypto coins after fees
-				amount, err := utils.GetCryptoAmount(pendingOrder, coinId)
+				amount, err := utils.GetCryptoAmountAfterFees(pendingOrder, coinId)
 				if err != nil {
 					return err
 				}
@@ -50,7 +50,7 @@ func LimitOrdersConstantPrices(coinId, tradingPair string, sellPrice, buyPrice, 
 					return err
 				}
 			} else { // if sell order
-				amount, err := utils.GetCryptoAmount(pendingOrder, coinId)
+				amount, err := utils.GetCryptoAmountAfterFees(pendingOrder, coinId)
 				if err != nil {
 					return err
 				}
@@ -60,10 +60,10 @@ func LimitOrdersConstantPrices(coinId, tradingPair string, sellPrice, buyPrice, 
 				}
 			}
 		} else if pendingOrder.ID == "" { // if the ID does not exist, the order no longer exists (and was not filled)
-			return errors.New("Placed order no longer exits (probably cancelled")
+			return errors.New("Placed order no longer exists (probably cancelled")
 		}
 
-		time.Sleep(time.Second * time.Duration(delayMultiplier)) // delay. Not really necessary, but may be useful if running in go routine
+		time.Sleep(time.Second * time.Duration(delayMultiplier)) // delay
 
 	}
 

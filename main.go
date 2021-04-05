@@ -2,18 +2,19 @@ package main
 
 import (
 	"coinbase-pro-trading-bot/common"
-	"coinbase-pro-trading-bot/simplebot"
+	"coinbase-pro-trading-bot/gridbot"
+	"fmt"
 	"log"
 
-	"github.com/preichenberger/go-coinbasepro/v2"
 	"github.com/shopspring/decimal"
 )
 
 var coinId = "MANA"
 var tradingPair = "MANA-USDC"
 
-var buyPrice decimal.Decimal = decimal.NewFromFloat(1.07)
-var sellPrice decimal.Decimal = decimal.NewFromFloat(1.14)
+var buyPrice decimal.Decimal = decimal.NewFromFloat(0.92)
+var sellPrice decimal.Decimal = decimal.NewFromFloat(1.1)
+var budget decimal.Decimal = decimal.NewFromFloat(100)
 
 //for now, initialSize is determined by budget at buy price.
 var initialSize decimal.Decimal = decimal.NewFromFloat(37)
@@ -23,14 +24,21 @@ func main() {
 	var err error
 
 	common.InitClient()
-	common.InitCurrencies()
 
-	//startOrder, err := common.Client.GetOrder("5357f73b-97fb-4668-9950-4de55eb7e064")
+	err = common.InitCurrencies()
+	if err != nil {
+		log.Println(err)
+	}
+	err = common.InitAccountIDs()
+	if err != nil {
+		log.Println(err)
+	}
+	err = common.InitProducts()
+	if err != nil {
+		log.Println(err)
+	}
 
-	//Start order is an initital order for the program to watch. This can be found using GetOrders and documenting the ID
-	startOrder := coinbasepro.Order{ID: ""}
+	err = gridbot.StartGridBot(coinId, tradingPair, budget, buyPrice, sellPrice, decimal.NewFromInt32(8), 4)
+	fmt.Println(err)
 
-	err = simplebot.LimitOrdersConstantPrices(coinId, tradingPair, sellPrice, buyPrice, initialSize, startOrder, 3)
-
-	log.Println(err.Error())
 }
